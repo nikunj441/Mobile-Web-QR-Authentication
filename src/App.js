@@ -1,6 +1,6 @@
 import React, {useState} from 'react';  
 
-import { View, Text, Button, Alert } from 'react-native';
+import { View, Text, Button, Alert, TextInput } from 'react-native';
 import SmsRetriever from 'react-native-sms-retriever';
 import { PermissionsAndroid } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
@@ -9,12 +9,16 @@ import { RNCamera } from 'react-native-camera';
 import { ViewPropTypes } from 'deprecated-react-native-prop-types'
 import axios from 'axios';
 
+import StudentDetails from './components/StudentDetails';
+
 const App = () => {
   const [phoneNumberInfo, setPhoneNumberInfo] = useState(0);
-  const [permission, setPermission] = useState('')
   const [scannerOpen, setScannerOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [rollNumber, setRollNumber] = useState('');
+  const [showScanButton, setShowScanButton] = useState(false);
 
+  const [showDetails, setShowDetails] = useState(false)
   //**********************************Request Phone Number****************************
   const requestPhoneNumber = async () => {
     const granted = await PermissionsAndroid.request(
@@ -29,24 +33,70 @@ const App = () => {
           const phoneWithoutCountryCode = phoneNumber.replace(/^\+91/, ''); 
           setPhoneNumberInfo(phoneWithoutCountryCode);
           console.log(phoneWithoutCountryCode,"Phone number without country code",);
-          setPermission('Successful')
+         
         
         } catch (error) {
           console.log(JSON.stringify(error));
         }
       } else {
         
-       setPermission('Denied')
        console.log('')
       }
     
     
   };
 
+  const updateScan = (showScanButton) =>{
+    setShowDetails(false)
+    setScannerOpen(!scannerOpen)
+  }
+  const handleProceed=()=>{
+    handleProceedData(rollNumber,phoneNumberInfo)
+  }
 
-  const handleScanPress = () => {
+  const handleProceedData = async(rollNumber, phoneNumberInfo) => {
+    const url = `http://172.18.2.12:8000/validateStudent`; 
+   
+
+    try {
+      const response =  await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rollNumber, phoneNumberInfo }),
+      });
+      
+
+      const responseData =  await response.json();
+      console.log('Response data:', responseData); 
+     
+
+     if(responseData.exists===1){
+      setScannerOpen(true)
+     }else if(responseData.exists === 0){
+       setShowDetails(true)
+     }else{
+      setMessage("Phone Number and roll number didn't match");
+     }
+        
+   
+
+    } catch (error) {
+      console.error('Error sending data to server:', error);
+      setMessage('Failed to record attendance'); // Handle error
+    }
+
+  };
+
+
+
+  /***************  Validate Student Ends *****************/
+  
+  /***************  Scan Starts *****************/
+  const handleExitScanPress = () => {
     if (phoneNumberInfo !== 0) {
-      setScannerOpen(true);
+      setScannerOpen(false);
     }
     else{
       Alert.alert('Enter phone number first');
@@ -72,8 +122,8 @@ const App = () => {
   };
 
   //send data to server
-  const sendToServer = async(phoneNumber, scannedData) => {
-    const url = `http://192.168.29.44:8080/attendance`; 
+  const sendToServer = async(phoneNumberInfo, scannedData) => {
+    const url = `http://172.18.2.12:8000/authenticateAttendance`; 
    
 
     try {
@@ -82,13 +132,12 @@ const App = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phoneNumber }),
+        body: JSON.stringify({ phoneNumberInfo, scannedData }),
       });
       
       
-      setScannerOpen(false)
+      setScannerOpen(false);
      
-
       const responseData =  await response.json();
       console.log('Response data:', responseData); 
       setMessage(responseData.message);
@@ -114,22 +163,37 @@ const App = () => {
   return (
     
     <View style={{ flex: 1 }}>
-      {message ? (
-        // If message state is set, render message component
-        renderMessage()
-      ) : (
-        // If message state is not set, render main UI components
+    {showDetails ? (
+      // If showDetails state is set, render StudentDetails component
+      <StudentDetails phoneNumberInfo={phoneNumberInfo} rollNumber={rollNumber} scannerOpen={scannerOpen} updateScan={updateScan}/>
+    ) : (
+      // If showDetails state is not set, render main UI components
+      message ? renderMessage() :
+      (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Phone Number: {phoneNumberInfo}</Text>
-          <Text>Permission: {permission}</Text>
+          <TextInput
+            style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 20, paddingHorizontal: 10 }}
+            placeholder="Enter Roll Number"
+            onChangeText={text => setRollNumber(text)}
+            value={rollNumber}
+          />
           <Button title="Get Phone Number" onPress={requestPhoneNumber} style={{ marginBottom: 20 }} />
-          <View style={{ marginTop: 20 }}>
-            <Button title="Scan" onPress={handleScanPress} />
-          </View>
+          <Text>Phone Number: {phoneNumberInfo}</Text>
+          {phoneNumberInfo != 0 && rollNumber != '' && (
+            <View style={{ marginTop: 20 }}>
+              <Button title="Proceed" onPress={handleProceed} />
+            </View>
+          )}
           {scannerOpen && renderScanner()}
+          {scannerOpen && <Button title='Exit' onPress={handleExitScanPress} />}
         </View>
-      )}
-    </View>
+      )
+    )}
+  { /* <View>
+      {scannerOpen && renderScanner()}
+          </View>*/}
+  </View>
+  
     
   );
 };
