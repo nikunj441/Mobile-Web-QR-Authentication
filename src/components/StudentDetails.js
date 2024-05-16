@@ -5,11 +5,13 @@ const StudentDetails = ({ rollNumber, phoneNumberInfo, showScanButton, updateSca
   const [distance, setDistance] = useState('');
   const [residence, setResidence] = useState('');
   const [income, setIncome] = useState('');
+  const [transport, setTransport] = useState('');
   const [participation, setParticipation] = useState(-1);
-  const [modalVisible, setModalVisible] = useState(false);
-  
+  const [modalVisibleResidence, setModalVisibleResidence] = useState(false);
+  const [modalVisibleTransport, setModalVisibleTransport] = useState(false);
+  const BASE_URL = `https://skoolai-server.onrender.com`
   const addStudent = async ()  => {
-    const url = `http://172.18.2.12:8000/addStudent`; 
+    const url = `${BASE_URL}/addStudent`; 
   
     try {
       const response =  await fetch(url, {
@@ -17,7 +19,7 @@ const StudentDetails = ({ rollNumber, phoneNumberInfo, showScanButton, updateSca
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ rollNumber, phoneNumberInfo, distance, residence, income, participation }),
+        body: JSON.stringify({ rollNumber, phoneNumberInfo, distance, residence, transport, income, participation }),
       });
       
 
@@ -59,46 +61,81 @@ const StudentDetails = ({ rollNumber, phoneNumberInfo, showScanButton, updateSca
       <Text style={styles.text}>Phone Number: {phoneNumberInfo}</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter Distance"
+        placeholder="Enter Distance in KM"
         onChangeText={text => setDistance(text)}
         value={distance}
         keyboardType="numeric"
       />
       <TextInput
         style={styles.input}
-        placeholder="Enter Income per annum"
+        placeholder="Enter Income per annum without ',' or '-'"
         onChangeText={text => setIncome(text)}
         value={income}
         keyboardType="numeric"
       />
       <TouchableHighlight
         style={styles.button}
-        onPress={() => setModalVisible(true)}
+        onPress={() => setModalVisibleResidence(true)}
       >
         <Text style={styles.buttonText}>{residence || 'Select Residence'}</Text>
       </TouchableHighlight>
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
+        visible={modalVisibleResidence}
         onRequestClose={() => {
-          setModalVisible(false);
+          setModalVisibleResidence(false);
         }}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.text}>Select Residence</Text>
             <View style={styles.buttonContainer}>
-              <Button title="Home" onPress={() => { setResidence('Home'); setModalVisible(false); }} />
+              <Button title="House" onPress={() => { setResidence('House'); setModalVisibleResidence(false); }} />
             </View>
             <View style={styles.buttonContainer}>
-              <Button title="Hostel" onPress={() => { setResidence('Hostel'); setModalVisible(false); }} />
+              <Button title="Hostel" onPress={() => { setResidence('Hostel'); setModalVisibleResidence(false); }} />
             </View>
             <View style={styles.buttonContainer}>
-              <Button title="Flat" onPress={() => { setResidence('Flat'); setModalVisible(false); }} />
+              <Button title="Flat" onPress={() => { setResidence('Flat'); setModalVisibleResidence(false); }} />
             </View>
             <View style={styles.buttonContainer}>
-              <Button title="PG" onPress={() => { setResidence('PG'); setModalVisible(false); }} />
+              <Button title="PG" onPress={() => { setResidence('PG'); setModalVisibleResidence(false); }} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <TouchableHighlight
+        style={styles.button}
+        onPress={() => setModalVisibleTransport(true)}
+      >
+        <Text style={styles.buttonText}>{transport || 'Select Mode of Transport'}</Text>
+      </TouchableHighlight>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisibleTransport}
+        onRequestClose={() => {
+          setModalVisibleTransport(false);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.text}>Mode of Transport</Text>
+            <View style={styles.buttonContainer}>
+              <Button title="Bus" onPress={() => { setTransport('Bus'); setModalVisibleTransport(false); }} />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button title="Walking" onPress={() => { setTransport('Walking'); setModalVisibleTransport(false); }} />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button title="Car" onPress={() => { setTransport('Car'); setModalVisibleTransport(false); }} />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button title="Bike" onPress={() => { setTransport('Bike'); setModalVisibleTransport(false); }} />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button title="Metro" onPress={() => { setTransport('Metro'); setModalVisibleTransport(false); }} />
             </View>
           </View>
         </View>

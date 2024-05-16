@@ -19,6 +19,9 @@ const App = () => {
   const [showScanButton, setShowScanButton] = useState(false);
 
   const [showDetails, setShowDetails] = useState(false)
+
+const BASE_URL = `https://skoolai-server.onrender.com`
+
   //**********************************Request Phone Number****************************
   const requestPhoneNumber = async () => {
     const granted = await PermissionsAndroid.request(
@@ -55,7 +58,7 @@ const App = () => {
   }
 
   const handleProceedData = async(rollNumber, phoneNumberInfo) => {
-    const url = `http://172.18.2.12:8000/validateStudent`; 
+    const url = `${BASE_URL}/validateStudent`; 
    
 
     try {
@@ -123,7 +126,7 @@ const App = () => {
 
   //send data to server
   const sendToServer = async(phoneNumberInfo, scannedData) => {
-    const url = `http://172.18.2.12:8000/authenticateAttendance`; 
+    const url = `${BASE_URL}/authenticateAttendance`; 
    
 
     try {

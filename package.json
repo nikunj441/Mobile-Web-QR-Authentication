@@ -17,9 +17,13 @@
     "awesome-phonenumber": "^6.4.0",
     "axios": "^1.6.7",
     "deprecated-react-native-prop-types": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
     "react": "18.2.0",
     "react-native": "0.73.3",
     "react-native-camera": "^4.2.1",
+    "react-native-dotenv": "^3.4.11",
     "react-native-phone-number-input": "^2.1.0",
     "react-native-qrcode-scanner": "^1.5.5",
     "react-native-sms-retriever": "^1.1.1"
