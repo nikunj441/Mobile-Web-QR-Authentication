@@ -20,7 +20,7 @@ const App = () => {
 
   const [showDetails, setShowDetails] = useState(false)
 
-const BASE_URL = `https://skoolai-server.onrender.com`
+const BASE_URL = `https://server-mjj8.onrender.com`
 
   //**********************************Request Phone Number****************************
   const requestPhoneNumber = async () => {

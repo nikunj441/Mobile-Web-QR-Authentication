@@ -9,7 +9,7 @@ const StudentDetails = ({ rollNumber, phoneNumberInfo, showScanButton, updateSca
   const [participation, setParticipation] = useState(-1);
   const [modalVisibleResidence, setModalVisibleResidence] = useState(false);
   const [modalVisibleTransport, setModalVisibleTransport] = useState(false);
-  const BASE_URL = `https://skoolai-server.onrender.com`
+  const BASE_URL = `https://server-mjj8.onrender.com`
   const addStudent = async ()  => {
     const url = `${BASE_URL}/addStudent`; 
   
